@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CA Intermediate Mastery Dashboard & Planner</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+              800: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.3);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+  <!-- Main Container -->
+  <div class="flex flex-col min-h-screen">
+
+    <!-- Navigation Header -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="bg-blue-600 text-white p-2 rounded-lg font-bold text-lg flex items-center justify-center w-10 h-10 shadow-md">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-lg leading-tight text-slate-900 dark:text-white">CA Inter Tracker</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400">ICAI Curriculum • Personal Command Center</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 sm:space-x-4">
+          <!-- Theme Toggle -->
+          <button id="themeToggle" class="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition" title="Toggle Light/Dark Theme">
+            <i class="fa-solid fa-moon dark:hidden"></i>
+            <i class="fa-solid fa-sun hidden dark:inline"></i>
+          </button>
+
+          <!-- Export/Import Data -->
+          <button onclick="exportData()" class="p-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center space-x-1" title="Backup Data">
+            <i class="fa-solid fa-download"></i>
+            <span class="hidden sm:inline">Backup</span>
+          </button>
+          <button onclick="document.getElementById('importFile').click()" class="p-2 text-xs font-medium rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center space-x-1" title="Restore Data">
+            <i class="fa-solid fa-upload"></i>
+            <span class="hidden sm:inline">Restore</span>
+          </button>
+          <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+
+          <!-- Reset Button -->
+          <button onclick="resetData()" class="p-2 text-xs font-medium rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 flex items-center space-x-1" title="Reset All Data">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- App Layout Container -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Sidebar Controls & Overview (LGs 4 cols) -->
+      <aside class="lg:col-span-4 space-y-6">
+
+        <!-- Countdown Banner -->
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl font-bold">CA</div>
+          <div class="flex justify-between items-start mb-2">
+            <span class="text-xs uppercase tracking-wider font-semibold text-blue-100 bg-white/10 px-2 py-0.5 rounded">Target Exam</span>
+            <button onclick="editTargetDate()" class="text-xs text-blue-200 hover:text-white underline"><i class="fa-solid fa-pen text-[10px] mr-1"></i>Edit Date</button>
+          </div>
+          <h2 id="examNameDisplay" class="font-bold text-xl mb-1">CA Inter Exams</h2>
+          <div class="flex items-baseline space-x-2 my-3">
+            <span id="countdownDays" class="text-4xl font-extrabold tracking-tight">00</span>
+            <span class="text-sm text-blue-100 font-medium">Days Remaining</span>
+          </div>
+          <p id="targetDateDisplay" class="text-xs text-blue-100/80">Target Date: Loading...</p>
+        </div>
+
+        <!-- Overall Progress Box -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+              <i class="fa-solid fa-chart-pie text-blue-500"></i>
+              <span>Syllabus Completion</span>
+            </h3>
+            <span id="overallPercentText" class="text-lg font-black text-blue-600 dark:text-blue-400">0%</span>
+          </div>
+
+          <!-- Main Dynamic Bar -->
+          <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+            <div id="overallProgressBar" class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+
+          <!-- Group Breakdown Pills -->
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block font-medium">Group 1 Progress</span>
+              <span id="g1PercentText" class="text-base font-bold text-slate-800 dark:text-white">0%</span>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block font-medium">Group 2 Progress</span>
+              <span id="g2PercentText" class="text-base font-bold text-slate-800 dark:text-white">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Shortcuts / Quote -->
+        <div class="bg-amber-50 dark:bg-slate-800/80 border border-amber-200 dark:border-amber-900/30 rounded-2xl p-4 text-amber-900 dark:text-amber-200 text-xs leading-relaxed flex items-start space-x-3">
+          <i class="fa-solid fa-quote-left text-amber-500 text-lg mt-0.5"></i>
+          <div>
+            <p class="italic font-medium" id="quoteText">"Success is the sum of small efforts, repeated day in and day out."</p>
+            <span class="block mt-1 font-semibold text-[10px] text-amber-700 dark:text-amber-400">— ICAI Aspirant Motto</span>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs for Main Panel -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-2 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col space-y-1">
+          <button onclick="switchTab('tab-syllabus')" id="btn-tab-syllabus" class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between transition bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+            <span class="flex items-center space-x-2">
+              <i class="fa-solid fa-book-open"></i>
+              <span>Syllabus Breakdown</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+          <button onclick="switchTab('tab-daily')" id="btn-tab-daily" class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between transition text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+            <span class="flex items-center space-x-2">
+              <i class="fa-solid fa-calendar-check"></i>
+              <span>Daily Planner & Slot Grid</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+          <button onclick="switchTab('tab-backlog')" id="btn-tab-backlog" class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between transition text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+            <span class="flex items-center space-x-2">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Backlog Tracker</span>
+            </span>
+            <span id="backlogCountBadge" class="bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+          </button>
+          <button onclick="switchTab('tab-sections')" id="btn-tab-sections" class="tab-btn w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-between transition text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+            <span class="flex items-center space-x-2">
+              <i class="fa-solid fa-bookmark"></i>
+              <span>Section & Provision Deck</span>
+            </span>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+
+      </aside>
+
+      <!-- Main Interactive Content Panel (LGs 8 cols) -->
+      <main class="lg:col-span-8 space-y-6">
+
+        <!-- TAB 1: SYLLABUS BREAKDOWN -->
+        <section id="tab-syllabus" class="tab-content block space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div>
+              <h2 class="text-lg font-bold text-slate-900 dark:text-white">ICAI CA Inter Subject Breakdown</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Track Lectures, 3 Revision Rounds & Practice Tests for every chapter</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select id="groupFilter" onchange="renderSyllabus()" class="bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-xs font-semibold rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 focus:outline-none">
+                <option value="ALL">All Subjects (G1 + G2)</option>
+                <option value="G1">Group 1 Only</option>
+                <option value="G2">Group 2 Only</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Subject Cards Container -->
+          <div id="syllabusContainer" class="space-y-4">
+            <!-- Dynamically Populated by JS -->
+          </div>
+        </section>
+
+        <!-- TAB 2: DAILY PLANNER & TIMETABLE -->
+        <section id="tab-daily" class="tab-content hidden space-y-6">
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Daily Hourly Planner & Schedule</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400" id="currentDateDisplay">Today's Goals</p>
+              </div>
+              <button onclick="clearCompletedDailyTasks()" class="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-lg">
+                <i class="fa-solid fa-trash-can mr-1"></i> Clear Done
+              </button>
+            </div>
+
+            <!-- Task Input -->
+            <form onsubmit="addDailyTask(event)" class="flex gap-2">
+              <input type="text" id="taskTime" placeholder="e.g. 06:00 AM - 08:30 AM" class="w-1/3 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none">
+              <input type="text" id="taskDesc" placeholder="Task details (e.g., DT Capital Gains 15 Qs)" required class="flex-1 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none">
+              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded-lg font-semibold transition flex items-center space-x-1">
+                <i class="fa-solid fa-plus"></i>
+                <span class="hidden sm:inline">Add</span>
+              </button>
+            </form>
+
+            <!-- Daily Task Progress -->
+            <div class="pt-2">
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-slate-600 dark:text-slate-400">Daily Target Completion</span>
+                <span id="dailyPercentText" class="text-blue-600 dark:text-blue-400">0%</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                <div id="dailyProgressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Slots List -->
+            <div id="dailyTasksList" class="space-y-2 pt-2">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 3: BACKLOG TRACKER -->
+        <section id="tab-backlog" class="tab-content hidden space-y-6">
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Backlog Clearing Manager</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Log missed lectures or delayed chapters to make sure nothing slips through</p>
+              </div>
+            </div>
+
+            <!-- Form to add backlog -->
+            <form onsubmit="addBacklogItem(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <input type="text" id="backlogSubject" placeholder="Subject (e.g. Audit)" required class="sm:col-span-3 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none">
+              <input type="text" id="backlogTopic" placeholder="Topic / Ch # / Pending Lec" required class="sm:col-span-4 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none">
+              <select id="backlogPriority" class="sm:col-span-3 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2 text-slate-800 dark:text-white focus:outline-none">
+                <option value="High">High Priority</option>
+                <option value="Medium" selected>Medium Priority</option>
+                <option value="Low">Low Priority</option>
+              </select>
+              <button type="submit" class="sm:col-span-2 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold rounded-lg px-3 py-2 transition">
+                <i class="fa-solid fa-plus mr-1"></i> Log
+              </button>
+            </form>
+
+            <!-- Backlog Items Table / List -->
+            <div id="backlogList" class="space-y-2 pt-2">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 4: SECTION & PROVISION RECALL DECK -->
+        <section id="tab-sections" class="tab-content hidden space-y-6">
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Section & Provision Recall Deck</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Quick-reference memory bank for Law, Tax & Standard provisions</p>
+              </div>
+            </div>
+
+            <!-- Add Section Form -->
+            <form onsubmit="addSectionItem(event)" class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <select id="secCategory" class="sm:col-span-3 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-2 py-2 text-slate-800 dark:text-white focus:outline-none">
+                <option value="Company Law">Company Law</option>
+                <option value="Other Laws">Other Laws</option>
+                <option value="Income Tax (DT)">Income Tax (DT)</option>
+                <option value="GST (IDT)">GST (IDT)</option>
+                <option value="Auditing Standards (SA)">Auditing (SA)</option>
+                <option value="Accounting Standards (AS)">AS / Ind AS</option>
+              </select>
+              <input type="text" id="secNumber" placeholder="Sec / SA No. (e.g. Sec 135)" required class="sm:col-span-3 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none">
+              <input type="text" id="secSummary" placeholder="Key provision summary / limit" required class="sm:col-span-4 text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-800 dark:text-white focus:outline-none">
+              <button type="submit" class="sm:col-span-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg px-3 py-2 transition">
+                <i class="fa-solid fa-plus mr-1"></i> Save
+              </button>
+            </form>
+
+            <!-- Filter & Search -->
+            <div class="flex items-center space-x-2 pt-2">
+              <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+                <input type="text" id="secSearch" onkeyup="renderSections()" placeholder="Search sections or keywords..." class="w-full text-xs pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-800 dark:text-white focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Cards Grid -->
+            <div id="sectionCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <!-- Dynamically Populated -->
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- Modal for Date Edit -->
+  <div id="dateModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl border border-slate-200 dark:border-slate-700">
+      <h3 class="font-bold text-slate-900 dark:text-white text-base">Set Target Exam Date</h3>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Exam Label</label>
+          <input type="text" id="inputExamName" value="CA Inter May/Nov Exams" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-800 dark:text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Target Date</label>
+          <input type="date" id="inputExamDate" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg text-slate-800 dark:text-white">
+        </div>
+      </div>
+      <div class="flex justify-end space-x-2 pt-2">
+        <button onclick="closeDateModal()" class="px-4 py-2 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-medium">Cancel</button>
+        <button onclick="saveTargetDate()" class="px-4 py-2 text-xs bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-semibold">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Javascript Logic -->
+  <script>
+    // --- CA INTER SYLLABUS DEFAULT DATA STRUCTURE ---
+    const DEFAULT_SYLLABUS = [
+      {
+        id: "p1",
+        code: "Paper 1",
+        group: "G1",
+        name: "Advanced Accounting",
+        chapters: [
+          "Framework & Accounting Standards (AS 1, 2, 3, 10, 11, 12, 13, 16)",
+          "Advanced AS (AS 4, 5, 7, 9, 14, 18, 19, 20, 22, 24, 26, 29)",
+          "Presentation & Disclosure AS (AS 17, 18, 25)",
+          "Accounting for Companies - Financial Statements",
+          "Buyback of Securities & Differential Rights",
+          "Accounting for Reconstruction & Amalgamation",
+          "Branch Accounting including Foreign Branches",
+          "Partnership Accounts - Dissolution, Amalgamation & Sale"
+        ]
+      },
+      {
+        id: "p2",
+        code: "Paper 2",
+        group: "G1",
+        name: "Corporate and Other Laws",
+        chapters: [
+          "Company Law: Ch 1 Preliminary & Ch 2 Incorporation",
+          "Company Law: Ch 3 Prospectus & Allotment",
+          "Company Law: Ch 4 Share Capital & Debentures",
+          "Company Law: Ch 5 Deposits & Ch 6 Charges",
+          "Company Law: Ch 7 Management & Administration",
+          "Company Law: Ch 8 Dividend & Ch 9 Accounts of Companies",
+          "Company Law: Ch 10 Audit & Auditors",
+          "Companies Incorporated Outside India (Foreign Companies)",
+          "The Limited Liability Partnership Act, 2008",
+          "The General Clauses Act, 1897",
+          "Interpretation of Statutes",
+          "FEMA 1999 - Foreign Exchange Management Act"
+        ]
+      },
+      {
+        id: "p3",
+        code: "Paper 3",
+        group: "G1",
+        name: "Taxation (DT & Indirect Tax)",
+        chapters: [
+          "DT: Basic Concepts & Residence Status",
+          "DT: Heads of Income - Salaries",
+          "DT: Heads of Income - House Property",
+          "DT: Heads of Income - PGBP",
+          "DT: Heads of Income - Capital Gains",
+          "DT: Heads of Income - Other Sources",
+          "DT: Clubbing, Set-off & Carry Forward",
+          "DT: Deductions under Chapter VI-A",
+          "DT: Assessment of Individuals & TDS/TCS",
+          "GST: Concept, Supply & Charge of GST",
+          "GST: Exemptions from GST & Time/Value of Supply",
+          "GST: Input Tax Credit (ITC) Rules",
+          "GST: Registration, Tax Invoice, Payment & Returns"
+        ]
+      },
+      {
+        id: "p4",
+        code: "Paper 4",
+        group: "G2",
+        name: "Cost & Management Accounting",
+        chapters: [
+          "Basic Cost Concepts & Material Cost",
+          "Employee Cost & Overhead Costs",
+          "Activity Based Costing (ABC)",
+          "Cost Sheet & Unit/Batch Costing",
+          "Job & Contract Costing",
+          "Process & Joint/By-Product Costing",
+          "Service Costing / Operating Costing",
+          "Standard Costing & Variance Analysis",
+          "Marginal Costing & CVP Analysis",
+          "Budgetary Control"
+        ]
+      },
+      {
+        id: "p5",
+        code: "Paper 5",
+        group: "G2",
+        name: "Auditing and Ethics",
+        chapters: [
+          "Nature, Scope & Ethics of Audit",
+          "Audit Strategy, Planning & Program",
+          "Audit Documentation & Audit Evidence (SA 200 series)",
+          "Risk Assessment & Internal Control",
+          "Audit in Automated Environment",
+          "Audit Sampling & Analytical Procedures (SA 500 series)",
+          "Audit of Items of Financial Statements",
+          "Completion & Review & Audit Report (SA 700 series)",
+          "Special Audit Types & Banks Audit",
+          "Ethics and Quality Control (SQC 1)"
+        ]
+      },
+      {
+        id: "p6",
+        code: "Paper 6",
+        group: "G2",
+        name: "Financial Management & Strategic Management",
+        chapters: [
+          "FM: Scope, Ratio Analysis & Financial Ratios",
+          "FM: Cost of Capital & Capital Structure",
+          "FM: Leverage Analysis (Operating, Financial, Combined)",
+          "FM: Investment Decisions / Capital Budgeting",
+          "FM: Dividend Decisions",
+          "FM: Working Management Capital",
+          "SM: Introduction to Strategic Management",
+          "SM: Strategic Analysis - External & Internal Environment",
+          "SM: Strategic Choices & Formulations",
+          "SM: Strategy Implementation & Control"
+        ]
+      }
+    ];
+
+    const DEFAULT_SECTIONS = [
+      { id: 1, category: "Company Law", number: "Sec 135", summary: "CSR Applicability: Net Worth >= 500 Cr, Turnover >= 1000 Cr, or Net Profit >= 5 Cr." },
+      { id: 2, category: "Company Law", number: "Sec 123", summary: "Declaration of Dividend only out of profits or free reserves after depreciation." },
+      { id: 3, category: "Income Tax (DT)", number: "Sec 194C", summary: "TDS on Contractor payments: 1% (Ind/HUF), 2% (Others). Cutoff > 30,000 single / 1,000,000 aggregate." },
+      { id: 4, category: "GST (IDT)", number: "Sec 16", summary: "Eligibility and conditions for taking Input Tax Credit (ITC)." },
+      { id: 5, category: "Auditing Standards (SA)", number: "SA 315", summary: "Identifying and Assessing the Risks of Material Misstatement through understanding the entity." }
+    ];
+
+    const DEFAULT_DAILY = [
+      { id: 1, time: "06:00 AM - 08:30 AM", desc: "Advanced AS Questions Practice", done: false },
+      { id: 2, time: "09:30 AM - 01:00 PM", desc: "Taxation - Capital Gains Provisions & Revision", done: false },
+      { id: 3, time: "02:30 PM - 05:30 PM", desc: "Audit SA 500 Series Flashcards & Writing Practice", done: false },
+      { id: 4, time: "06:30 PM - 08:30 PM", desc: "Costing Marginal Costing numericals", done: false }
+    ];
+
+    // --- APP STATE ---
+    let appState = {
+      examName: "CA Inter Exams",
+      examDate: getFutureDate(90),
+      syllabusProgress: {}, // key: "p1-ch0", val: {lec: true, r1: false, r2: false, r3: false, pr: false}
+      dailyTasks: DEFAULT_DAILY,
+      backlog: [
+        { id: 1, subject: "Law", topic: "FEMA Chapter lectures 2 & 3", priority: "High" }
+      ],
+      sections: DEFAULT_SECTIONS
+    };
+
+    // --- HELPER FUNCTIONS ---
+    function getFutureDate(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem('CA_INTER_DASHBOARD_DATA');
+      if (saved) {
+        try {
+          appState = JSON.parse(saved);
+        } catch (e) {
+          console.error("Failed to parse saved state", e);
+        }
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem('CA_INTER_DASHBOARD_DATA', JSON.stringify(appState));
+      updateProgressIndicators();
+    }
+
+    // --- INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      initTheme();
+      initCountdown();
+      renderSyllabus();
+      renderDailyTasks();
+      renderBacklogs();
+      renderSections();
+      updateProgressIndicators();
+    });
+
+    // Theme Management
+    function initTheme() {
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      });
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+        btn.classList.add('text-slate-600', 'dark:text-slate-400');
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      activeBtn.classList.remove('text-slate-600', 'dark:text-slate-400');
+      activeBtn.classList.add('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-600', 'dark:text-blue-400');
+    }
+
+    // Countdown Timer
+    function initCountdown() {
+      document.getElementById('examNameDisplay').innerText = appState.examName || "CA Inter Exams";
+      document.getElementById('targetDateDisplay').innerText = `Target Date: ${appState.examDate}`;
+      
+      const target = new Date(appState.examDate).getTime();
+      const now = new Date().getTime();
+      const diff = Math.max(0, Math.ceil((target - now) / (1000 * 60 * 60 * 24)));
+      document.getElementById('countdownDays').innerText = diff < 10 ? '0' + diff : diff;
+    }
+
+    function editTargetDate() {
+      document.getElementById('inputExamName').value = appState.examName || "CA Inter Exams";
+      document.getElementById('inputExamDate').value = appState.examDate;
+      document.getElementById('dateModal').classList.remove('hidden');
+      document.getElementById('dateModal').classList.add('flex');
+    }
+
+    function closeDateModal() {
+      document.getElementById('dateModal').classList.add('hidden');
+      document.getElementById('dateModal').classList.remove('flex');
+    }
+
+    function saveTargetDate() {
+      appState.examName = document.getElementById('inputExamName').value || "CA Inter Exams";
+      appState.examDate = document.getElementById('inputExamDate').value;
+      saveState();
+      initCountdown();
+      closeDateModal();
+    }
+
+    // --- SYLLABUS TRACKER RENDERING & LOGIC ---
+    function renderSyllabus() {
+      const filter = document.getElementById('groupFilter').value;
+      const container = document.getElementById('syllabusContainer');
+      container.innerHTML = '';
+
+      DEFAULT_SYLLABUS.forEach(subject => {
+        if (filter !== 'ALL' && subject.group !== filter) return;
+
+        const subjectCard = document.createElement('div');
+        subjectCard.className = "bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden";
+
+        // Calculate progress for subject
+        let totalItems = subject.chapters.length * 5; // 5 checkboxes per chapter
+        let checkedItems = 0;
+
+        subject.chapters.forEach((_, idx) => {
+          const key = `${subject.id}-ch${idx}`;
+          const item = appState.syllabusProgress[key] || {};
+          if (item.lec) checkedItems++;
+          if (item.r1) checkedItems++;
+          if (item.r2) checkedItems++;
+          if (item.r3) checkedItems++;
+          if (item.pr) checkedItems++;
+        });
+
+        const subjectPercent = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+
+        let chaptersHTML = '';
+        subject.chapters.forEach((chName, idx) => {
+          const key = `${subject.id}-ch${idx}`;
+          const item = appState.syllabusProgress[key] || { lec: false, r1: false, r2: false, r3: false, pr: false };
+
+          chaptersHTML += `
+            <div class="p-3 border-b border-slate-100 dark:border-slate-700/60 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition flex flex-col md:flex-row md:items-center justify-between gap-2">
+              <div class="text-xs font-medium text-slate-800 dark:text-slate-200 flex-1">
+                <span class="text-slate-400 font-mono text-[10px] mr-1">Ch ${idx + 1}.</span> ${chName}
+              </div>
+              <div class="flex items-center space-x-2 text-xs">
+                <label class="cursor-pointer inline-flex items-center bg-slate-100 dark:bg-slate-700/80 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-blue-50">
+                  <input type="checkbox" onchange="toggleSyllabusItem('${key}', 'lec', this.checked)" ${item.lec ? 'checked' : ''} class="mr-1 accent-blue-600">
+                  Lec
+                </label>
+                <label class="cursor-pointer inline-flex items-center bg-slate-100 dark:bg-slate-700/80 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-blue-50">
+                  <input type="checkbox" onchange="toggleSyllabusItem('${key}', 'r1', this.checked)" ${item.r1 ? 'checked' : ''} class="mr-1 accent-indigo-600">
+                  R1
+                </label>
+                <label class="cursor-pointer inline-flex items-center bg-slate-100 dark:bg-slate-700/80 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-blue-50">
+                  <input type="checkbox" onchange="toggleSyllabusItem('${key}', 'r2', this.checked)" ${item.r2 ? 'checked' : ''} class="mr-1 accent-indigo-600">
+                  R2
+                </label>
+                <label class="cursor-pointer inline-flex items-center bg-slate-100 dark:bg-slate-700/80 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-blue-50">
+                  <input type="checkbox" onchange="toggleSyllabusItem('${key}', 'r3', this.checked)" ${item.r3 ? 'checked' : ''} class="mr-1 accent-indigo-600">
+                  R3
+                </label>
+                <label class="cursor-pointer inline-flex items-center bg-slate-100 dark:bg-slate-700/80 px-2 py-1 rounded text-[11px] font-semibold text-slate-600 dark:text-slate-300 hover:bg-blue-50">
+                  <input type="checkbox" onchange="toggleSyllabusItem('${key}', 'pr', this.checked)" ${item.pr ? 'checked' : ''} class="mr-1 accent-emerald-600">
+                  Test
+                </label>
+              </div>
+            </div>
+          `;
+        });
+
+        subjectCard.innerHTML = `
+          <details class="group" open>
+            <summary class="flex justify-between items-center p-4 cursor-pointer select-none bg-slate-50/70 dark:bg-slate-700/40">
+              <div class="flex items-center space-x-3">
+                <span class="px-2 py-0.5 text-[10px] font-extrabold rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">${subject.code}</span>
+                <h3 class="font-bold text-sm text-slate-800 dark:text-white">${subject.name}</h3>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div class="text-right">
+                  <span class="text-xs font-bold text-blue-600 dark:text-blue-400">${subjectPercent}%</span>
+                </div>
+                <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform group-open:rotate-180"></i>
+              </div>
+            </summary>
+            <div class="divide-y divide-slate-100 dark:divide-slate-700">
+              ${chaptersHTML}
+            </div>
+          </details>
+        `;
+
+        container.appendChild(subjectCard);
+      });
+    }
+
+    function toggleSyllabusItem(key, type, checked) {
+      if (!appState.syllabusProgress[key]) {
+        appState.syllabusProgress[key] = { lec: false, r1: false, r2: false, r3: false, pr: false };
+      }
+      appState.syllabusProgress[key][type] = checked;
+      saveState();
+      renderSyllabus();
+    }
+
+    // --- OVERALL PROGRESS CALCULATION ---
+    function updateProgressIndicators() {
+      let g1Total = 0, g1Checked = 0;
+      let g2Total = 0, g2Checked = 0;
+
+      DEFAULT_SYLLABUS.forEach(subject => {
+        subject.chapters.forEach((_, idx) => {
+          const key = `${subject.id}-ch${idx}`;
+          const item = appState.syllabusProgress[key] || {};
+          const count = (item.lec ? 1 : 0) + (item.r1 ? 1 : 0) + (item.r2 ? 1 : 0) + (item.r3 ? 1 : 0) + (item.pr ? 1 : 0);
+
+          if (subject.group === 'G1') {
+            g1Total += 5;
+            g1Checked += count;
+          } else {
+            g2Total += 5;
+            g2Checked += count;
+          }
+        });
+      });
+
+      const g1Percent = g1Total > 0 ? Math.round((g1Checked / g1Total) * 100) : 0;
+      const g2Percent = g2Total > 0 ? Math.round((g2Checked / g2Total) * 100) : 0;
+      const totalPercent = (g1Total + g2Total) > 0 ? Math.round(((g1Checked + g2Checked) / (g1Total + g2Total)) * 100) : 0;
+
+      document.getElementById('overallPercentText').innerText = totalPercent + '%';
+      document.getElementById('overallProgressBar').style.width = totalPercent + '%';
+      document.getElementById('g1PercentText').innerText = g1Percent + '%';
+      document.getElementById('g2PercentText').innerText = g2Percent + '%';
+    }
+
+    // --- DAILY PLANNER LOGIC ---
+    function renderDailyTasks() {
+      const container = document.getElementById('dailyTasksList');
+      container.innerHTML = '';
+
+      let doneCount = 0;
+      appState.dailyTasks.forEach(task => {
+        if (task.done) doneCount++;
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl border flex items-center justify-between transition ${
+          task.done ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 opacity-60' : 'bg-white dark:bg-slate-700/50 border-slate-200 dark:border-slate-600'
+        }`;
+
+        item.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <input type="checkbox" onchange="toggleDailyTask(${task.id})" ${task.done ? 'checked' : ''} class="w-4 h-4 accent-blue-600 rounded cursor-pointer">
+            <div>
+              <span class="text-[11px] font-bold text-blue-600 dark:text-blue-400 block">${task.time || 'Anytime'}</span>
+              <span class="text-xs font-medium ${task.done ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'}">${task.desc}</span>
+            </div>
+          </div>
+          <button onclick="deleteDailyTask(${task.id})" class="text-slate-400 hover:text-red-500 text-xs px-2">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        `;
+        container.appendChild(item);
+      });
+
+      const total = appState.dailyTasks.length;
+      const percent = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+      document.getElementById('dailyPercentText').innerText = percent + '%';
+      document.getElementById('dailyProgressBar').style.width = percent + '%';
+    }
+
+    function addDailyTask(e) {
+      e.preventDefault();
+      const time = document.getElementById('taskTime').value;
+      const desc = document.getElementById('taskDesc').value;
+      if (!desc) return;
+
+      appState.dailyTasks.push({
+        id: Date.now(),
+        time: time,
+        desc: desc,
+        done: false
+      });
+
+      document.getElementById('taskTime').value = '';
+      document.getElementById('taskDesc').value = '';
+      saveState();
+      renderDailyTasks();
+    }
+
+    function toggleDailyTask(id) {
+      const task = appState.dailyTasks.find(t => t.id === id);
+      if (task) task.done = !task.done;
+      saveState();
+      renderDailyTasks();
+    }
+
+    function deleteDailyTask(id) {
+      appState.dailyTasks = appState.dailyTasks.filter(t => t.id !== id);
+      saveState();
+      renderDailyTasks();
+    }
+
+    function clearCompletedDailyTasks() {
+      appState.dailyTasks = appState.dailyTasks.filter(t => !t.done);
+      saveState();
+      renderDailyTasks();
+    }
+
+    // --- BACKLOG LOGIC ---
+    function renderBacklogs() {
+      const container = document.getElementById('backlogList');
+      container.innerHTML = '';
+      document.getElementById('backlogCountBadge').innerText = appState.backlog.length;
+
+      if (appState.backlog.length === 0) {
+        container.innerHTML = `<p class="text-xs text-center py-6 text-slate-400">No pending backlogs logged! Great job keeping up 🎉</p>`;
+        return;
+      }
+
+      appState.backlog.forEach(item => {
+        let badgeColor = "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300";
+        if (item.priority === 'High') badgeColor = "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300";
+        if (item.priority === 'Low') badgeColor = "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300";
+
+        const card = document.createElement('div');
+        card.className = "p-3 bg-white dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 flex items-center justify-between";
+        card.innerHTML = `
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded ${badgeColor}">${item.priority}</span>
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-100">${item.subject}</span>
+            </div>
+            <p class="text-xs text-slate-600 dark:text-slate-300">${item.topic}</p>
+          </div>
+          <button onclick="resolveBacklog(${item.id})" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700 border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-lg flex items-center space-x-1">
+            <i class="fa-solid fa-check"></i>
+            <span>Clear</span>
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addBacklogItem(e) {
+      e.preventDefault();
+      const subject = document.getElementById('backlogSubject').value;
+      const topic = document.getElementById('backlogTopic').value;
+      const priority = document.getElementById('backlogPriority').value;
+
+      if (!subject || !topic) return;
+
+      appState.backlog.push({
+        id: Date.now(),
+        subject,
+        topic,
+        priority
+      });
+
+      document.getElementById('backlogSubject').value = '';
+      document.getElementById('backlogTopic').value = '';
+      saveState();
+      renderBacklogs();
+    }
+
+    function resolveBacklog(id) {
+      appState.backlog = appState.backlog.filter(b => b.id !== id);
+      saveState();
+      renderBacklogs();
+    }
+
+    // --- SECTION RECALL DECK LOGIC ---
+    function renderSections() {
+      const container = document.getElementById('sectionCardsContainer');
+      const query = (document.getElementById('secSearch').value || '').toLowerCase();
+      container.innerHTML = '';
+
+      const filtered = appState.sections.filter(s => 
+        s.number.toLowerCase().includes(query) || 
+        s.category.toLowerCase().includes(query) || 
+        s.summary.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="col-span-2 text-xs text-center py-6 text-slate-400">No section cards match your search query.</p>`;
+        return;
+      }
+
+      filtered.forEach(sec => {
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-700/50 p-4 rounded-xl border border-slate-200 dark:border-slate-600 flex flex-col justify-between space-y-2 relative group";
+        
+        card.innerHTML = `
+          <div>
+            <div class="flex justify-between items-start mb-1">
+              <span class="text-[10px] font-bold uppercase text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 rounded">${sec.category}</span>
+              <button onclick="deleteSection(${sec.id})" class="text-slate-300 hover:text-red-500 text-xs">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <h4 class="font-black text-sm text-slate-900 dark:text-white mt-1">${sec.number}</h4>
+            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-1">${sec.summary}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addSectionItem(e) {
+      e.preventDefault();
+      const category = document.getElementById('secCategory').value;
+      const number = document.getElementById('secNumber').value;
+      const summary = document.getElementById('secSummary').value;
+
+      if (!number || !summary) return;
+
+      appState.sections.unshift({
+        id: Date.now(),
+        category,
+        number,
+        summary
+      });
+
+      document.getElementById('secNumber').value = '';
+      document.getElementById('secSummary').value = '';
+      saveState();
+      renderSections();
+    }
+
+    function deleteSection(id) {
+      appState.sections = appState.sections.filter(s => s.id !== id);
+      saveState();
+      renderSections();
+    }
+
+    // --- DATA IMPORT / EXPORT / RESET ---
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `CA_Inter_Planner_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported && typeof imported === 'object') {
+            appState = imported;
+            saveState();
+            location.reload();
+          }
+        } catch (err) {
+          alert('Invalid backup file structure.');
+        }
+      };
+      reader.readAsText(event.target.files[0]);
+    }
+
+    function resetData() {
+      if (confirm("Are you sure you want to reset all tracking progress, daily tasks, and backlogs back to default settings?")) {
+        localStorage.removeItem('CA_INTER_DASHBOARD_DATA');
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>
